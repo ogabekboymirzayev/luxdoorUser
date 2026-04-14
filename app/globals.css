@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    --primary: 160 30% 18%;
+    --primary-foreground: 42 40% 90%;
+
+    --secondary: 40 20% 94%;
+    --secondary-foreground: 0 0% 12%;
+
+    --muted: 40 15% 95%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 42 65% 55%;
+    --accent-foreground: 0 0% 8%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 160 30% 18%;
+
+    --radius: 0.5rem;
+
+    --gold: 42 65% 55%;
+    --gold-light: 42 60% 70%;
+    --gold-dark: 42 70% 40%;
+    --cream: 40 30% 96%;
+    --dark: 0 0% 8%;
+    --dark-muted: 0 0% 15%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 160 30% 18%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 40 15% 95%;
+    --sidebar-accent-foreground: 0 0% 12%;
+    --sidebar-border: 40 15% 88%;
+    --sidebar-ring: 160 30% 18%;
+  }
+
+  .dark {
+    --background: 226 38% 7%;           /* #090e1a */
+    --foreground: 210 20% 98%;          /* #f8fafc near white */
+
+    --card: 226 38% 7%;                 /* #090e1a */
+    --card-foreground: 210 20% 98%;
+
+    --popover: 226 38% 7%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 210 20% 98%;             /* white text */
+    --primary-foreground: 222 47% 7%;   /* dark bg for primary btns */
+
+    --secondary: 217 32% 17%;           /* #23272f dark gray */
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 215 16% 24%;               /* #2d323b muted dark */
+    --muted-foreground: 210 16% 70%;    /* #b0b6c3 muted text */
+
+    --accent: 42 65% 55%;               /* gold accent unchanged */
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 215 16% 24%;              /* match muted */
+    --input: 215 16% 24%;
+    --ring: 42 65% 55%;                 /* gold ring for focus */
+
+    --gold: 42 65% 55%;
+    --gold-light: 42 60% 70%;
+    --gold-dark: 42 70% 40%;
+    --cream: 40 30% 16%;                /* much darker cream for dark mode */
+    --dark: 222 47% 7%;
+    --dark-muted: 217 32% 17%;
+
+    --sidebar-background: 222 47% 10%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 42 65% 55%;      /* gold for sidebar highlights */
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 215 16% 24%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 215 16% 24%;
+    --sidebar-ring: 42 65% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 100%);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold-dark)) 0%, hsl(var(--gold)) 50%, hsl(var(--gold-light)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-dark-section {
+    background-color: hsl(var(--dark));
+    color: hsl(var(--cream));
+  }
+
+  .bg-cream {
+    background-color: hsl(var(--cream));
+  }
+
+  .dark .bg-dark-section {
+    background-color: #090e1a;
+    color: hsl(var(--card-foreground));
+  }
+
+  .dark .bg-cream {
+    background-color: #090e1a;
+  }
+}
