@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -8,6 +9,7 @@ import { Button } from '../components/ui/button';
 import { Menu, X, Globe, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import LeadFormModal from './LeadFormModal';
+import logo from '../assets/logo.png';
 
 const Navbar = () => {
   const { t, lang, setLang } = useLanguage();
@@ -40,8 +42,11 @@ const Navbar = () => {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="container mx-auto px-4 flex items-center justify-between h-16 lg:h-20">
-          <Link href="/" className="font-display text-2xl font-bold tracking-tight text-foreground">
-            Lux <span className="text-gradient-gold">Doors</span>
+          <Link href="/" className="flex items-center gap-3 font-display text-2xl font-bold tracking-tight text-foreground">
+            <Image src={logo} alt="Musa Doors logo" className="h-9 w-9 object-contain" />
+            <span>
+              Musa <span className="text-gradient-gold">Doors</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}

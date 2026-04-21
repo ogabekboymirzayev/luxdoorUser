@@ -2,7 +2,7 @@ import { Providers } from "../app/components/Providers";
 import "./globals.css";
 
 export const metadata = {
-  title: "Lux Door Dealer Hub",
+  title: "Musa Door Dealer Hub",
   description: "Premium door dealer website",
 };
 

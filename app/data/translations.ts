@@ -61,7 +61,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
     },
     about: {
       title: 'Biz haqimizda',
-      description: 'Lux Doors — 10 yildan ortiq tajribaga ega premium eshik ishlab chiqaruvchisi. Biz O\'zbekiston va Markaziy Osiyo bo\'ylab minglab mijozlarga xizmat ko\'rsatganmiz.',
+      description: 'Musa Doors — 10 yildan ortiq tajribaga ega premium eshik ishlab chiqaruvchisi. Biz O\'zbekiston va Markaziy Osiyo bo\'ylab minglab mijozlarga xizmat ko\'rsatganmiz.',
       experience: '10+ yil tajriba',
       clients: '5000+ mijoz',
       products: '200+ mahsulot',
@@ -155,7 +155,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
     },
     about: {
       title: 'О нас',
-      description: 'Lux Doors — производитель премиальных дверей с более чем 10-летним опытом. Мы обслуживаем тысячи клиентов по всему Узбекистану и Центральной Азии.',
+      description: 'Musa Doors — производитель премиальных дверей с более чем 10-летним опытом. Мы обслуживаем тысячи клиентов по всему Узбекистану и Центральной Азии.',
       experience: '10+ лет опыта',
       clients: '5000+ клиентов',
       products: '200+ товаров',
