@@ -11,7 +11,7 @@ import {
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { CheckCircle } from 'lucide-react';
-import axios from 'axios';
+import { leadsAPI } from '@/lib/api-client';
 
 interface LeadFormModalProps {
   open: boolean;
@@ -19,7 +19,14 @@ interface LeadFormModalProps {
   productName?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+type ApiErrorShape = {
+  response?: {
+    status?: number;
+    data?: {
+      error?: string;
+    };
+  };
+};
 
 const LeadFormModal = ({ open, onOpenChange, productName }: LeadFormModalProps) => {
   const { t } = useLanguage();
@@ -46,17 +53,30 @@ const LeadFormModal = ({ open, onOpenChange, productName }: LeadFormModalProps) 
     }
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/api/leads`, {
+      await leadsAPI.create({
         name: name || "Noma'lum",
         phone,
         message: productName ? `Mahsulot: ${productName}` : "Umumiy so'rov",
+        source: 'website',
       });
       setSubmitted(true);
       setName('');
       setPhone('+998');
       setError('');
-    } catch (err) {
-      setError('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+    } catch (err: unknown) {
+      const normalized = err as ApiErrorShape;
+      const status = normalized.response?.status;
+      const apiError = normalized.response?.data?.error;
+
+      if (status === 409) {
+        setError('Bu raqam bilan yaqinda so\'rov yuborilgan. Birozdan keyin urinib ko\'ring.');
+      } else if (status === 429) {
+        setError('Juda ko\'p urinish bo\'ldi. 1 daqiqadan keyin qayta urinib ko\'ring.');
+      } else if (apiError) {
+        setError(apiError);
+      } else {
+        setError('Xatolik yuz berdi. Qayta urinib ko\'ring.');
+      }
     } finally {
       setLoading(false);
     }

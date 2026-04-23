@@ -25,6 +25,7 @@ interface Category {
   id: string;
   nameUz: string;
   nameRu: string;
+  _count?: { products: number };
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -34,6 +35,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
   const [priceMin, setPriceMin] = useState<number | null>(null);
   const [priceMax, setPriceMax] = useState<number | null>(null);
   const [minInput, setMinInput] = useState('');
@@ -41,33 +43,70 @@ export default function ProductsPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sort, setSort] = useState<SortOption>('default');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const hasActiveFilters =
+    priceMin !== null ||
+    priceMax !== null ||
+    selectedCategories.length > 0 ||
+    query.trim().length > 0;
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesRes = await fetch(`${API_URL}/api/categories`, { credentials: 'include' }).then(r => r.json());
+        if (categoriesRes.success) {
+          setCategories(categoriesRes.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [productsRes, categoriesRes] = await Promise.all([
-          productsAPI.getAll({ limit: 100 }),
-          fetch(`${API_URL}/api/categories`, { credentials: 'include' }).then(r => r.json()),
-        ]);
-        if (productsRes.success) setProducts(productsRes.data.products);
-        if (categoriesRes.success) setCategories(categoriesRes.data);
+        const productsRes = await productsAPI.getAll({
+          page,
+          limit: 12,
+          categoryIds: selectedCategories.length > 0 ? selectedCategories.join(',') : undefined,
+          search: query.trim() || undefined,
+          minPrice: priceMin ?? undefined,
+          maxPrice: priceMax ?? undefined,
+          sort,
+        });
+
+        if (productsRes.success) {
+          setProducts(productsRes.data.products);
+          setTotalPages(productsRes.data.pagination.pages || 1);
+          setTotalItems(productsRes.data.pagination.total || 0);
+        }
       } catch (err) {
         console.error('Failed to fetch:', err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, []);
+  }, [page, selectedCategories, query, priceMin, priceMax, sort]);
 
   const toggleCategory = (id: string) => {
-    setSelectedCategories(prev =>
+    setPage(1);
+    setSelectedCategories((prev) =>
       prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
     );
   };
 
   const resetFilters = () => {
+    setPage(1);
+    setQuery('');
     setPriceMin(null);
     setPriceMax(null);
     setMinInput('');
@@ -78,6 +117,7 @@ export default function ProductsPage() {
 
   const handleMinBlur = () => {
     const val = parseInt(minInput.replace(/\s/g, ''));
+    setPage(1);
     if (!isNaN(val) && val >= 0) {
       setPriceMin(val);
     } else {
@@ -88,6 +128,7 @@ export default function ProductsPage() {
 
   const handleMaxBlur = () => {
     const val = parseInt(maxInput.replace(/\s/g, ''));
+    setPage(1);
     if (!isNaN(val) && val >= 0) {
       setPriceMax(val);
     } else {
@@ -96,23 +137,13 @@ export default function ProductsPage() {
     }
   };
 
-  const hasActiveFilters =
-    priceMin !== null ||
-    priceMax !== null ||
-    selectedCategories.length > 0;
-
-  const filtered = useMemo(() => {
-    const result = products.filter((p) => {
-      const price = Number(p.price);
-      if (priceMin !== null && price < priceMin) return false;
-      if (priceMax !== null && price > priceMax) return false;
-      if (selectedCategories.length > 0 && !selectedCategories.includes(p.category?.id)) return false;
-      return true;
-    });
-    if (sort === 'price-asc') return [...result].sort((a, b) => Number(a.price) - Number(b.price));
-    if (sort === 'price-desc') return [...result].sort((a, b) => Number(b.price) - Number(a.price));
-    return result;
-  }, [products, priceMin, priceMax, selectedCategories, sort]);
+  const pageList = useMemo(() => {
+    const pages: number[] = [];
+    const start = Math.max(1, page - 2);
+    const end = Math.min(totalPages, page + 2);
+    for (let i = start; i <= end; i += 1) pages.push(i);
+    return pages;
+  }, [page, totalPages]);
 
   // Filter JSX — komponent emas, o'zgaruvchi sifatida
   const filterContent = (
@@ -128,7 +159,7 @@ export default function ProductsPage() {
             {categories.map((cat) => {
               const isActive = selectedCategories.includes(cat.id);
               const catName = lang === 'uz' ? cat.nameUz : cat.nameRu;
-              const count = products.filter(p => p.category?.id === cat.id).length;
+              const count = cat._count?.products ?? 0;
               return (
                 <button
                   key={cat.id}
@@ -213,6 +244,19 @@ export default function ProductsPage() {
             {t('products.title')}
           </h1>
 
+          <div className="mb-4">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => {
+                setPage(1);
+                setQuery(e.target.value);
+              }}
+              placeholder={lang === 'uz' ? 'Mahsulot qidirish...' : 'Поиск товаров...'}
+              className="w-full border border-border rounded-md px-4 py-2 bg-background text-foreground"
+            />
+          </div>
+
           <div className="flex items-center justify-between mb-8 gap-4">
             <button
               onClick={() => setFiltersOpen(!filtersOpen)}
@@ -224,7 +268,10 @@ export default function ProductsPage() {
             </button>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value as SortOption)}
+              onChange={(e) => {
+                setPage(1);
+                setSort(e.target.value as SortOption);
+              }}
               className="text-sm border border-border rounded-md px-3 py-2 bg-background text-foreground"
             >
               <option value="default">{t('products.filter.sort')}</option>
@@ -283,13 +330,17 @@ export default function ProductsPage() {
                 </div>
               )}
 
+              <div className="text-sm text-muted-foreground mb-4">
+                {lang === 'uz' ? `Jami: ${totalItems} ta mahsulot` : `Всего: ${totalItems} товаров`}
+              </div>
+
               {loading ? (
                 <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="rounded-xl bg-muted animate-pulse aspect-[3/4]" />
                   ))}
                 </div>
-              ) : filtered.length === 0 ? (
+              ) : products.length === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-4xl mb-3">🔍</p>
                   <h3 className="text-lg font-semibold text-foreground mb-1">
@@ -307,11 +358,33 @@ export default function ProductsPage() {
                   </Button>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filtered.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
+                <>
+                  <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
+                      <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+                        {lang === 'uz' ? 'Oldingi' : 'Назад'}
+                      </Button>
+                      {pageList.map((p) => (
+                        <Button
+                          key={p}
+                          variant={p === page ? 'default' : 'outline'}
+                          onClick={() => setPage(p)}
+                        >
+                          {p}
+                        </Button>
+                      ))}
+                      <Button variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>
+                        {lang === 'uz' ? 'Keyingi' : 'Далее'}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

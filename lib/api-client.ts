@@ -31,7 +31,17 @@ apiClient.interceptors.response.use(
 // ============ PRODUCTS API ============
 
 export const productsAPI = {
-  getAll: async (params?: { category?: string; search?: string; page?: number; limit?: number }) => {
+  getAll: async (params?: {
+    category?: string;
+    categoryId?: string;
+    categoryIds?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    sort?: 'default' | 'price-asc' | 'price-desc';
+  }) => {
     try {
       const response = await apiClient.get('/api/products', { params });
       return response.data;
@@ -51,7 +61,7 @@ export const productsAPI = {
     }
   },
 
-  create: async (data: any) => {
+  create: async (data: unknown) => {
     try {
       const response = await apiClient.post('/api/products', data);
       return response.data;
@@ -61,7 +71,7 @@ export const productsAPI = {
     }
   },
 
-  update: async (id: string, data: any) => {
+  update: async (id: string, data: unknown) => {
     try {
       const response = await apiClient.put(`/api/products/${id}`, data);
       return response.data;
@@ -85,7 +95,7 @@ export const productsAPI = {
 // ============ LEADS API ============
 
 export const leadsAPI = {
-  create: async (data: { name: string; phone: string; message: string }) => {
+  create: async (data: { name: string; phone: string; message: string; source?: 'website' | 'telegram' | 'phone' | 'other' }) => {
     try {
       const response = await apiClient.post('/api/leads', data);
       return response.data;
@@ -131,7 +141,7 @@ export const commentsAPI = {
     }
   },
 
-  create: async (data: { productId: string; text: string; rating: number }) => {
+  create: async (data: { productId: string; authorName: string; text: string; rating: number }) => {
     try {
       const response = await apiClient.post('/api/comments', data);
       return response.data;

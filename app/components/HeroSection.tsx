@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { useState } from 'react';
 import LeadFormModal from './LeadFormModal';
 import Link from 'next/link';
+import Image from 'next/image';
 import heroImage from '../assets/door-hero.jpg';
 
 const HeroSection = () => {
@@ -35,11 +36,12 @@ const HeroSection = () => {
             </div>
             <div className="relative animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="rounded-2xl overflow-hidden shadow-2xl">
-                <img
+                <Image
                   src={heroImage.src}
                   alt="Premium Door"
                   width={1024}
                   height={1280}
+                  priority
                   className="w-full h-auto object-cover"
                 />
               </div>
