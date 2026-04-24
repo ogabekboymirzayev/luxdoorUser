@@ -8,9 +8,10 @@ type RouteParams = {
 };
 
 export async function generateMetadata(
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<RouteParams> }
 ): Promise<Metadata> {
-  const productId = decodeURIComponent(params.id);
+  const { id } = await params;
+  const productId = decodeURIComponent(id);
 
   try {
     const response = await fetch(`${API_URL}/api/products/${encodeURIComponent(productId)}`, {
