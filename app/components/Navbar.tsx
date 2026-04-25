@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from '../components/ui/button';
-import { Menu, X, Globe, Moon, Sun, Phone } from 'lucide-react';
+import { Menu, X, Globe, Moon, Sun, Phone, Clock } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import LeadFormModal from './LeadFormModal';
 import logo from '../assets/logo.png';
@@ -18,7 +18,14 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === 'dark';
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -53,107 +60,148 @@ const Navbar = () => {
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'bg-background/98 backdrop-blur-xl border-b border-border shadow-sm'
-            : 'bg-background/90 backdrop-blur-md border-b border-border/50'
+      {/* Top Bar */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
+          isDark
+            ? 'bg-slate-950 text-slate-100 border-slate-800'
+            : 'bg-gray-900 text-white border-gray-800'
         }`}
       >
-        <div className="container mx-auto px-4 flex items-center justify-between h-16 lg:h-[72px]">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 h-12 flex items-center justify-between text-xs md:text-sm">
+          <div className="flex items-center gap-6 md:gap-10">
+            <a
+              href="tel:+998507110064"
+              className={`flex items-center gap-2 transition-colors font-medium ${
+                isDark ? 'hover:text-amber-300' : 'hover:text-amber-400'
+              }`}
+            >
+              <Phone className="w-4 h-4" />
+              <span>+998 50 711 00 64</span>
+            </a>
+            <div className={`hidden sm:flex items-center gap-2 ${isDark ? 'text-slate-400' : 'text-gray-400'}`}>
+              <Clock className="w-4 h-4" />
+              <span>{lang === 'uz' ? 'Dush-Shan: 9:00-19:00' : 'Пн-Сб: 9:00-19:00'}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setLang(lang === 'uz' ? 'ru' : 'uz')}
+              className={`flex items-center gap-1 px-2 py-1 rounded transition-colors font-medium ${
+                isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-800'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {lang === 'uz' ? 'РУ' : 'УЗ'}
+            </button>
+            <button
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              className={`p-1.5 rounded transition-colors ${
+                isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-800'
+              }`}
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navbar */}
+      <nav
+        className={`fixed top-12 left-0 right-0 z-40 transition-all duration-300 border-b-2 ${
+          isDark
+            ? 'bg-slate-950/95 border-slate-800 text-slate-100 backdrop-blur-xl'
+            : 'bg-white border-gray-100 text-gray-900'
+        } ${scrolled ? 'shadow-md' : ''}`}
+      >
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="relative w-9 h-9 rounded-lg overflow-hidden">
+            <div className="relative w-9 h-9 md:w-10 md:h-10 rounded-lg overflow-hidden">
               <Image src={logo} alt="Musa Doors logo" fill className="object-contain" />
             </div>
-            <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              Musa <span className="text-gradient-gold">Doors</span>
+            <span className={`font-bold text-lg md:text-xl tracking-tight ${isDark ? 'text-slate-100' : 'text-gray-900'}`}>
+              Musa <span className="text-amber-600">Doors</span>
             </span>
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {links.map((link) =>
               link.path.startsWith('/#') ? (
                 <button
                   key={link.path}
                   onClick={() => handleNav(link.path)}
-                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-muted"
+                  className={`px-4 py-2 text-sm font-medium transition-colors rounded-lg relative group ${
+                    isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
                 >
                   {link.label}
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 bg-amber-500 w-0 group-hover:w-6 transition-all duration-300 rounded-t-full" />
                 </button>
               ) : (
                 <Link
                   key={link.path}
                   href={link.path}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all relative group ${
                     isActive(link.path)
-                      ? 'text-foreground bg-muted font-semibold'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'text-amber-600'
+                      : isDark
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   {link.label}
+                  <span className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-1 bg-amber-500 transition-all duration-300 rounded-t-full ${isActive(link.path) ? 'w-6' : 'w-0 group-hover:w-6'}`} />
                 </Link>
               )
             )}
           </div>
 
           {/* Desktop actions */}
-          <div className="hidden lg:flex items-center gap-2">
-            <a
-              href="tel:+998507110064"
-              className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg hover:bg-muted"
-            >
-              <Phone className="w-4 h-4 text-gold" />
-              <span>+998 50 711 00 64</span>
-            </a>
-            <button
-              onClick={() => setLang(lang === 'uz' ? 'ru' : 'uz')}
-              className="flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-lg border border-border hover:border-gold/30"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              {lang === 'uz' ? 'RU' : 'UZ'}
-            </button>
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-gold/30 transition-colors"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
+          <div className="hidden lg:flex items-center gap-3">
             <Button
               onClick={() => setLeadOpen(true)}
-              className="gradient-gold text-foreground font-semibold text-sm px-5 h-9 rounded-lg border-0 hover:opacity-90 transition-opacity shadow-sm"
+              className="bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold px-6 h-10 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md text-sm border-0"
             >
-              {t('nav.leaveRequest')}
+              {lang === 'uz' ? 'Bepul konsultatsiya' : 'Бесплатная консультация'}
             </Button>
           </div>
 
           {/* Mobile toggle */}
           <div className="lg:hidden flex items-center gap-2">
             <button
-              onClick={() => setLang(lang === 'uz' ? 'ru' : 'uz')}
-              className="text-xs font-semibold px-2 py-1 rounded-md border border-border text-muted-foreground"
-            >
-              {lang === 'uz' ? 'RU' : 'UZ'}
-            </button>
-            <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              className={`p-2 rounded-lg transition-colors ${
+                isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-100'
+              }`}
             >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileOpen ? (
+                <X className={`w-6 h-6 ${isDark ? 'text-slate-100' : 'text-gray-900'}`} />
+              ) : (
+                <Menu className={`w-6 h-6 ${isDark ? 'text-slate-100' : 'text-gray-900'}`} />
+              )}
             </button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="lg:hidden border-t border-border bg-background px-4 py-4 space-y-1">
+          <div className={`lg:hidden border-t-2 px-4 py-4 space-y-1 shadow-lg ${isDark ? 'border-slate-800 bg-slate-950' : 'border-gray-200 bg-white'}`}>
             {links.map((link) =>
               link.path.startsWith('/#') ? (
                 <button
                   key={link.path}
                   onClick={() => handleNav(link.path)}
-                  className="block w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
+                  className={`block w-full text-left text-sm font-semibold py-3 px-4 rounded-lg transition-colors ${
+                    isDark
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-amber-50'
+                  }`}
                 >
                   {link.label}
                 </button>
@@ -162,41 +210,28 @@ const Navbar = () => {
                   key={link.path}
                   href={link.path}
                   onClick={() => setMobileOpen(false)}
-                  className={`block text-sm font-medium py-2.5 px-3 rounded-lg transition-colors ${
+                  className={`block text-sm font-semibold py-3 px-4 rounded-lg transition-colors ${
                     isActive(link.path)
-                      ? 'text-foreground bg-muted font-semibold'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? 'text-amber-600 bg-amber-50'
+                      : isDark
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-800'
+                        : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   {link.label}
                 </Link>
               )
             )}
-            <div className="pt-2 space-y-2">
-              <a
-                href="tel:+998507110064"
-                className="flex items-center gap-2 w-full text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
-              >
-                <Phone className="w-4 h-4 text-gold" />
-                +998 50 711 00 64
-              </a>
-              <button
-                onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setMobileOpen(false); }}
-                className="flex items-center gap-2 w-full text-left text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-              </button>
-              <Button
-                className="w-full gradient-gold text-foreground font-semibold border-0 hover:opacity-90"
-                onClick={() => { setMobileOpen(false); setLeadOpen(true); }}
-              >
-                {t('nav.leaveRequest')}
-              </Button>
-            </div>
+            <Button
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 mt-4 border-0"
+              onClick={() => { setMobileOpen(false); setLeadOpen(true); }}
+            >
+              {lang === 'uz' ? 'Bepul konsultatsiya' : 'Бесплатная консультация'}
+            </Button>
           </div>
         )}
       </nav>
+
       <LeadFormModal open={leadOpen} onOpenChange={setLeadOpen} />
     </>
   );

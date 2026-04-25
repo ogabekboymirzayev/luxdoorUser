@@ -43,7 +43,7 @@ const Footer = () => {
             {/* Social */}
             <div className="flex items-center gap-3">
               <a
-                href="https://www.instagram.com/musadoors.uz"
+                href="https://www.instagram.com/mdf_temir_eshiklari_dveri_akfa/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/50 hover:text-gold hover:border-gold/40 transition-all"
@@ -52,7 +52,7 @@ const Footer = () => {
                 <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="https://t.me/musadoorsuz"
+                href="https://t.me/mdf_temir_eshiklari_dveri_akfa"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/50 hover:text-gold hover:border-gold/40 transition-all"

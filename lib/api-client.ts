@@ -5,7 +5,22 @@
 
 import axios, { AxiosError, AxiosInstance } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const normalizeBaseUrl = (url: string) => url.replace(/\/+$/, '');
+
+const resolveApiBaseUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (envUrl) {
+    return normalizeBaseUrl(envUrl);
+  }
+
+  if (typeof window !== 'undefined') {
+    return `http://${window.location.hostname}:3001`;
+  }
+
+  return 'http://localhost:3001';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -157,6 +172,20 @@ export const commentsAPI = {
       return response.data;
     } catch (error) {
       console.error(`Failed to delete comment ${id}:`, error);
+      throw error;
+    }
+  },
+};
+
+// ============ CATEGORIES API ============
+
+export const categoriesAPI = {
+  getAll: async (params?: { includeDeleted?: boolean }) => {
+    try {
+      const response = await apiClient.get('/api/categories', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
       throw error;
     }
   },

@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -9,21 +12,18 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
       {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      }
-    ]
-  },
-  async headers() {
-    return [
+        protocol: 'http',
+        hostname: '10.115.115.60',
+        port: '3001',
+        pathname: '/uploads/**',
+      },
       {
-        source: "/uploads/:path*",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=31536000" }
-        ]
-      }
-    ];
-  }
-};
+        protocol: 'https',
+        hostname: 'luxdoorsadmin.uz',
+        pathname: '/uploads/**',
+      },
+    ],
+  },
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

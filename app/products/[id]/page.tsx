@@ -7,7 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import { Button } from '../../components/ui/button';
-import { ArrowLeft, CheckCircle2, Star } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Star, Phone } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import LeadFormModal from '../../components/LeadFormModal';
 import ProductCard from '../../components/ProductCard';
@@ -85,6 +85,7 @@ export default function ProductDetailPage() {
   const id = decodeURIComponent(params.id as string);
   const { t, lang } = useLanguage();
   const [leadOpen, setLeadOpen] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [related, setRelated] = useState<ApiProduct[]>([]);
   const [activeImage, setActiveImage] = useState(0);
@@ -142,6 +143,20 @@ export default function ProductDetailPage() {
     if (!product?.images?.length) return [];
     return product.images.map((img) => (img.startsWith('http') ? img : `${API_URL}${img}`));
   }, [product]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (imageUrls.length === 0) return;
+      if (e.key === 'ArrowLeft') {
+        setActiveImage((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
+      } else if (e.key === 'ArrowRight') {
+        setActiveImage((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [imageUrls.length]);
 
   const ratingAverage = product?.ratingSummary?.average ?? 0;
   const ratingCount = product?.ratingSummary?.count ?? product?.comments?.length ?? 0;
@@ -273,28 +288,54 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 pt-24 pb-16">
-        <div className="container mx-auto px-4">
-          <Link href="/products" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
-            <ArrowLeft className="w-4 h-4" />
-            {t('products.title')}
-          </Link>
+      <main className="flex-1 pt-32 md:pt-40 pb-32 lg:pb-16">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm mb-8 flex-wrap">
+            <Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium transition">
+              {lang === 'uz' ? 'Bosh sahifa' : 'Главная'}
+            </Link>
+            <span className="text-gray-400 dark:text-gray-500">→</span>
+            <Link href="/products" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium transition">
+              {t('products.title')}
+            </Link>
+            <span className="text-gray-400 dark:text-gray-500">→</span>
+            <span className="text-gray-900 dark:text-white font-semibold line-clamp-1">{name}</span>
+          </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Image */}
+          <div className="grid lg:grid-cols-2 gap-12 mb-16">
+            {/* Image Gallery */}
             <div className="space-y-4">
-              <div className="rounded-xl overflow-hidden bg-muted aspect-[3/4] relative">
+              <div className="rounded-2xl overflow-hidden bg-gray-100 aspect-[3/4] relative group cursor-zoom-in">
                 {imageUrls[activeImage] ? (
                   <Image
                     src={imageUrls[activeImage]}
                     alt={name}
                     fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm font-medium">
                     {lang === 'uz' ? 'Rasm yo\'q' : 'Нет изображения'}
                   </div>
+                )}
+                {imageUrls.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setActiveImage((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1))}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md backdrop-blur-sm transition-all z-10"
+                      aria-label="Previous image"
+                    >
+                      <ArrowLeft className="w-5 h-5 text-gray-900" />
+                    </button>
+                    <button
+                      onClick={() => setActiveImage((prev) => (prev === imageUrls.length - 1 ? 0 : prev + 1))}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-md backdrop-blur-sm transition-all z-10"
+                      aria-label="Next image"
+                    >
+                      <ArrowLeft className="w-5 h-5 text-gray-900 rotate-180" />
+                    </button>
+                  </>
                 )}
               </div>
 
@@ -304,7 +345,9 @@ export default function ProductDetailPage() {
                     <button
                       key={`${url}-${index}`}
                       onClick={() => setActiveImage(index)}
-                      className={`relative aspect-square rounded-lg overflow-hidden border ${activeImage === index ? 'border-primary' : 'border-border'}`}
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                        activeImage === index ? 'border-amber-500 shadow-md' : 'border-gray-200 hover:border-amber-300'
+                      }`}
                     >
                       <Image src={url} alt={`${name}-${index + 1}`} fill className="object-cover" />
                     </button>
@@ -316,118 +359,200 @@ export default function ProductDetailPage() {
             {/* Info */}
             <div className="space-y-6">
               {product.badgeType && product.badgeType !== 'NONE' && badgeLabel && (
-                <span className="inline-flex w-fit items-center rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+                <span className="inline-flex w-fit items-center rounded-full bg-amber-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-amber-900 border border-amber-200">
                   {badgeLabel}
                 </span>
               )}
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-                {name}
-              </h1>
-              <div className="flex items-baseline gap-3">
-                <p className="text-3xl font-bold text-gold-dark">
-                  {Number(product.price).toLocaleString()} so'm
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+                  {name}
+                </h1>
+
+                {ratingCount > 0 && (
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} className={`w-5 h-5 ${s <= Math.round(ratingAverage) ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                    <span className="text-base font-semibold text-gray-900 dark:text-white">
+                      {ratingAverage.toFixed(1)} ({ratingCount} {lang === 'uz' ? 'sharh' : 'отзывов'})
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-baseline gap-4">
+                <p className="text-4xl font-bold text-amber-600">
+                  {Number(product.price).toLocaleString()} {lang === 'uz' ? "so'm" : "сум"}
                 </p>
                 {product.oldPrice && (
-                  <p className="text-base text-muted-foreground line-through">
-                    {Number(product.oldPrice).toLocaleString()} so'm
+                  <p className="text-xl text-gray-500 line-through font-medium">
+                    {Number(product.oldPrice).toLocaleString()} {lang === 'uz' ? "so'm" : "сум"}
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1 text-amber-500">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className={`w-4 h-4 ${s <= Math.round(ratingAverage) ? 'fill-current' : ''}`} />
-                  ))}
-                </div>
-                <span>{ratingAverage.toFixed(1)} ({ratingCount})</span>
-              </div>
-              <p className="text-muted-foreground leading-relaxed">{description}</p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="rounded-lg border border-border p-3 text-sm">
-                  <p className="font-semibold text-foreground">{lang === 'uz' ? 'Yetkazib berish' : 'Доставка'}</p>
-                  <p className="text-muted-foreground">{lang === 'uz' ? '3-5 ish kuni' : '3-5 рабочих дней'}</p>
+              <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">{description}</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                  <p className="font-bold text-gray-900 dark:text-white text-sm">{lang === 'uz' ? 'Yetkazib berish' : 'Доставка'}</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">{lang === 'uz' ? '3-5 ish kuni' : '3-5 рабочих дней'}</p>
                 </div>
-                <div className="rounded-lg border border-border p-3 text-sm">
-                  <p className="font-semibold text-foreground">{lang === 'uz' ? 'Kafolat' : 'Гарантия'}</p>
-                  <p className="text-muted-foreground">{lang === 'uz' ? 'Rasmiy kafolat mavjud' : 'Официальная гарантия'}</p>
+                <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                  <p className="font-bold text-gray-900 dark:text-white text-sm">{lang === 'uz' ? 'Kafolat' : 'Гарантия'}</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">{lang === 'uz' ? 'Rasmiy kafolat mavjud' : 'Официальная гарантия'}</p>
                 </div>
-                <div className="rounded-lg border border-border p-3 text-sm">
-                  <p className="font-semibold text-foreground">{lang === 'uz' ? 'O\'rnatish' : 'Установка'}</p>
-                  <p className="text-muted-foreground">{lang === 'uz' ? 'Professional xizmat' : 'Профессиональный сервис'}</p>
+                <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                  <p className="font-bold text-gray-900 dark:text-white text-sm">{lang === 'uz' ? 'O\'rnatish' : 'Установка'}</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">{lang === 'uz' ? 'Professional xizmat' : 'Профессиональный сервис'}</p>
                 </div>
               </div>
 
               {specs.length > 0 && (
-                <div className="border-t border-border pt-6 space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">{t('detail.specifications')}</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{t('detail.specifications')}</h3>
+                  <div className="grid grid-cols-2 gap-6 text-sm">
                     {specs.map(({ label, value }) => (
                       <div key={label}>
-                        <span className="text-muted-foreground">{label}</span>
-                        <p className="font-medium text-foreground">{value}</p>
+                        <p className="text-gray-600 dark:text-gray-400 font-medium text-xs uppercase tracking-wide mb-1">{label}</p>
+                        <p className="font-bold text-gray-900 dark:text-white">{value}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <Button variant="gold" size="lg" className="w-full text-base h-14 mt-4" onClick={() => setLeadOpen(true)}>
-                {t('detail.leaveRequest')}
-              </Button>
-              <a href="tel:+998507110064" className="w-full inline-flex items-center justify-center rounded-md border border-border h-12 text-sm font-medium hover:bg-muted transition">
-                {lang === 'uz' ? 'Tezkor qo\'ng\'iroq' : 'Быстрый звонок'}
-              </a>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" />{lang === 'uz' ? 'Shartnoma asosida ishlaymiz' : 'Работаем по договору'}</p>
-                <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" />{lang === 'uz' ? 'Sotuvdan keyingi qo\'llab-quvvatlash' : 'Поддержка после покупки'}</p>
+              <div className="space-y-2 text-sm">
+                <p className="flex items-center gap-2 text-gray-700"><CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="font-medium">{lang === 'uz' ? 'Shartnoma asosida ishlaymiz' : 'Работаем по договору'}</span></p>
+                <p className="flex items-center gap-2 text-gray-700"><CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" /><span className="font-medium">{lang === 'uz' ? 'Sotuvdan keyingi qo\'llab-quvvatlash' : 'Поддержка после покупки'}</span></p>
               </div>
             </div>
           </div>
 
-          <section className="mt-20">
+          {/* Sticky CTA Section */}
+          <div className="fixed bottom-0 left-0 right-0 lg:relative z-50 lg:z-auto bg-white dark:bg-gray-900 border-t-2 border-gray-200 dark:border-gray-700 p-4 md:p-6 lg:p-0 lg:border-0 lg:shadow-none shadow-2xl">
+            <div className="container mx-auto px-4 md:px-8 lg:px-16">
+              <div className="flex gap-2 md:gap-3 lg:gap-4">
+                <button
+                  onClick={() => setLeadOpen(true)}
+                  className="flex-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3 md:py-3.5 px-6 md:px-8 rounded-lg md:rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md text-sm md:text-base"
+                >
+                  {t('detail.leaveRequest')}
+                </button>
+                <button
+                  onClick={() => setShowPhoneModal(true)}
+                  className="flex-1 inline-flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 font-bold py-3 md:py-3.5 px-6 md:px-8 rounded-lg md:rounded-xl hover:border-amber-500 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200 text-sm md:text-base"
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  <span className="hidden sm:inline">{lang === 'uz' ? 'Qo\'ng\'iroq' : 'Звонок'}</span>
+                  <span className="sm:hidden">{lang === 'uz' ? '+998' : '+998'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Phone Modal */}
+          {showPhoneModal && (
+            <div
+              className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowPhoneModal(false)}
+            >
+              <div
+                className="bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md p-6 shadow-2xl"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {lang === 'uz' ? 'Filial tanlang' : 'Выберите филиал'}
+                  </h3>
+                  <button
+                    onClick={() => setShowPhoneModal(false)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Branches */}
+                <div className="space-y-3">
+                  {[
+                    { name: lang === 'uz' ? "Toshkent" : "Ташкент", phone: "+998 50 711 00 64", hours: "9:00–19:00" },
+                    { name: lang === 'uz' ? "Qo'qon" : "Коканд", phone: "+998 77 221 84 84", hours: "9:00–19:00" },
+                    { name: lang === 'uz' ? "Buxoro" : "Бухара", phone: "+998 91 403 20 70", hours: "9:00–19:00" },
+                  ].map((branch) => (
+                    <a
+                      key={branch.name}
+                      href={`tel:${branch.phone.replace(/\s/g, '')}`}
+                      className="flex items-center justify-between p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200 group"
+                    >
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white group-hover:text-amber-600">
+                          {branch.name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {branch.hours}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono font-medium text-amber-600">
+                          {branch.phone}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{lang === 'uz' ? 'Qo\'ng\'iroq →' : 'Звонок →'}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Reviews Section */}
+          <section className="mt-24 pt-16 border-t-2 border-gray-200 dark:border-gray-700">
             <div className="grid lg:grid-cols-2 gap-10">
               <div>
-                <h2 className="text-2xl font-display font-bold mb-4 text-foreground">
+                <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
                   {lang === 'uz' ? 'Mijozlar sharhlari' : 'Отзывы клиентов'}
                 </h2>
                 <div className="space-y-4">
                   {(product.comments || []).length === 0 ? (
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-base">
                       {lang === 'uz' ? 'Hozircha sharh yo\'q. Birinchi bo\'lib sharh qoldiring.' : 'Пока нет отзывов. Оставьте первый комментарий.'}
                     </p>
                   ) : (
                     (product.comments || []).slice(0, 8).map((comment) => (
-                      <div key={comment.id} className="rounded-xl border border-border p-4">
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={comment.id} className="rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+                        <div className="flex items-center justify-between mb-3">
                           <div>
-                            <p className="text-sm font-semibold text-foreground mb-1">{comment.authorName || (lang === 'uz' ? 'Foydalanuvchi' : 'Пользователь')}</p>
-                            <div className="flex items-center gap-1 text-amber-500">
+                            <p className="text-base font-bold text-gray-900 dark:text-white mb-2">{comment.authorName || (lang === 'uz' ? 'Foydalanuvchi' : 'Пользователь')}</p>
+                            <div className="flex items-center gap-0.5">
                               {[1, 2, 3, 4, 5].map((s) => (
-                                <Star key={s} className={`w-4 h-4 ${s <= comment.rating ? 'fill-current' : ''}`} />
+                                <Star key={s} className={`w-4 h-4 ${s <= comment.rating ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`} />
                               ))}
                             </div>
                           </div>
-                          <span className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString(lang === 'uz' ? 'uz-UZ' : 'ru-RU')}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">{new Date(comment.createdAt).toLocaleDateString(lang === 'uz' ? 'uz-UZ' : 'ru-RU')}</span>
                         </div>
-                        <p className="text-sm text-foreground leading-relaxed">{comment.text}</p>
+                        <p className="text-base text-gray-700 dark:text-gray-300 leading-relaxed">{comment.text}</p>
                       </div>
                     ))
                   )}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border p-5 h-fit">
-                <h3 className="text-xl font-semibold mb-4 text-foreground">
+              <div className="rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 h-fit sticky top-28">
+                <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
                   {lang === 'uz' ? 'Sharh qoldiring' : 'Оставьте отзыв'}
                 </h3>
 
-                <div className="mb-4">
-                  <p className="text-sm text-muted-foreground mb-2">{lang === 'uz' ? 'Baho' : 'Оценка'}</p>
-                  <div className="flex items-center gap-2">
+                <div className="mb-5">
+                  <p className="text-sm font-bold text-gray-700 mb-3">{lang === 'uz' ? 'Baho' : 'Оценка'}</p>
+                  <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <button key={s} onClick={() => setReviewRating(s)}>
-                        <Star className={`w-6 h-6 ${s <= reviewRating ? 'text-amber-500 fill-current' : 'text-muted-foreground'}`} />
+                      <button key={s} onClick={() => setReviewRating(s)} className="transition-transform hover:scale-110">
+                        <Star className={`w-7 h-7 ${s <= reviewRating ? 'text-amber-500 fill-current' : 'text-gray-300'}`} />
                       </button>
                     ))}
                   </div>
@@ -439,7 +564,7 @@ export default function ProductDetailPage() {
                     value={reviewAuthorName}
                     onChange={(e) => setReviewAuthorName(e.target.value)}
                     placeholder={lang === 'uz' ? 'Ismingiz' : 'Ваше имя'}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="w-full rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                   />
                 </div>
 
@@ -448,26 +573,30 @@ export default function ProductDetailPage() {
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
                     placeholder={lang === 'uz' ? 'Sharhingizni yozing...' : 'Напишите ваш комментарий...'}
-                    className="min-h-28"
+                    className="min-h-28 border-2 border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
                   />
                 </div>
 
-                {reviewError && <p className="text-sm text-destructive mb-3">{reviewError}</p>}
+                {reviewError && <p className="text-sm text-red-600 font-medium mb-3">{reviewError}</p>}
 
-                <Button onClick={addReview} disabled={reviewSubmitting} className="w-full">
+                <button
+                  onClick={addReview}
+                  disabled={reviewSubmitting}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-base"
+                >
                   {reviewSubmitting
                     ? (lang === 'uz' ? 'Yuborilmoqda...' : 'Отправка...')
                     : (lang === 'uz' ? 'Sharh yuborish' : 'Отправить отзыв')}
-                </Button>
+                </button>
               </div>
             </div>
           </section>
 
-          {/* Related */}
+          {/* Related Products */}
           {related.length > 0 && (
-            <div className="mt-20">
-              <h2 className="text-2xl font-display font-bold mb-8 text-foreground">{t('detail.relatedProducts')}</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="mt-24">
+              <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">{t('detail.relatedProducts')}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {related.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
