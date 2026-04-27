@@ -28,6 +28,7 @@ interface ProductCardProps {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const TASHKENT_PHONE = '+998507110064';
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { t, lang } = useLanguage();
@@ -130,11 +131,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </Link>
           <button
             onClick={() => {
-              // Will be connected to cart functionality
-              const message = lang === 'uz'
-                ? `${name} mahsulotini buyurtma qilmoqchiman`
-                : `Я хочу заказать ${name}`;
-              window.open(`https://wa.me/998507110064?text=${encodeURIComponent(message)}`, '_blank');
+              window.location.href = `tel:${TASHKENT_PHONE}`;
             }}
             className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 text-sm shadow-md"
           >

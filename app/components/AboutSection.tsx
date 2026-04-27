@@ -35,7 +35,7 @@ const AboutSection = () => {
 
             {/* Floating stats card */}
             <div className="absolute -bottom-6 -right-4 lg:-right-10 bg-card border border-border rounded-2xl p-6 shadow-xl max-w-[200px]">
-              <p className="text-4xl font-display font-bold text-gradient-gold">2014</p>
+              <p className="text-4xl font-display font-bold text-gradient-gold">2009</p>
               <p className="text-sm text-muted-foreground mt-1">
                 {lang === 'uz' ? 'yildan buyon bozorda' : 'год основания'}
               </p>

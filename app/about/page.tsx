@@ -166,7 +166,7 @@ export default function AboutPage() {
                   {t('aboutPage.storyTitle') as string}
                 </span>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground leading-tight mb-6">
-                  {lang === 'uz' ? '2014-yildan buyon' : 'С 2014 года'}
+                  {lang === 'uz' ? '2009-yildan buyon' : 'С 2009 года'}
                   <br />
                   <span className="text-gradient-gold">
                     {lang === 'uz' ? 'ishonch quraymiz' : 'строим доверие'}

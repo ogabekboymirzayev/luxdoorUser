@@ -56,11 +56,10 @@ const HeroSection = () => {
         <a
           key={i}
           href={`tel:${b.tel}`}
-          className={`flex items-center justify-between px-4 py-3.5 transition-colors group ${
-            dark
+          className={`flex items-center justify-between px-4 py-3.5 transition-colors group ${dark
               ? 'hover:bg-white/5 border-b border-white/5 last:border-0'
               : 'hover:bg-amber-50 border-b border-gray-50 last:border-0'
-          }`}
+            }`}
         >
           <div>
             <p className={`font-bold text-sm ${dark ? 'text-white' : 'text-gray-800'}`}>
@@ -87,9 +86,12 @@ const HeroSection = () => {
             <p className="text-gray-400 uppercase tracking-widest text-[10px] font-semibold mb-2">
               {lang === 'uz' ? 'Premium sifatdagi' : 'Премиум качество'}
             </p>
-            <h1 className="text-gray-900 font-black uppercase leading-none mb-6" style={{ fontSize: '38px' }}>
-              {lang === 'uz' ? 'TEMIR VA' : 'МЕТАЛЛ И'}<br />
-              {lang === 'uz' ? 'MDF ESHIKLAR' : 'МДФ ДВЕРИ'}
+            <h1
+              className="text-gray-900 font-black uppercase leading-none mb-6"
+              style={{ fontSize: '38px' }}
+            >
+              {lang === 'uz' ? 'ELEKTRON QULFLAR,' : 'ЭЛЕКТРОННЫЕ ЗАМКИ,'}<br />
+              {lang === 'uz' ? 'TEMIR VA MDF ESHIKLAR' : 'МЕТАЛЛ И МДФ ДВЕРИ'}
             </h1>
 
             <div className="flex flex-col gap-4 mb-8">
