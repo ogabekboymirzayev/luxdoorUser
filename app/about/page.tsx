@@ -127,7 +127,7 @@ export default function AboutPage() {
               </span>
               <h1 className="font-display font-bold text-white leading-[1.1] mb-6">
                 <span className="block text-5xl md:text-6xl lg:text-7xl">
-                  {lang === 'uz' ? 'Eshikdan ortidagi' : 'Доверие'}
+                  {lang === 'uz' ? 'Eshik ortidagi' : 'Доверие'}
                 </span>
                 <span className="block text-5xl md:text-6xl lg:text-7xl text-gradient-gold mt-2">
                   {lang === 'uz' ? 'ishonch' : 'за каждой дверью'}

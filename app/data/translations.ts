@@ -77,7 +77,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
       clients: '5000+ xursand mijoz',
       products: '200+ model katalogda',
       story: 'Bizning tarix',
-      storyText: '2014-yilda kichik usta sifatida boshlagan Musa Do\'stmurodov bugun Markaziy Osiyodagi eng yirik premium eshik brendini boshqaradi. Har bir eshik — uning shaxsiy nazorati ostida ishlab chiqiladi.',
+      storyText: `2009-yildan buyon faoliyat yuritib kelayotgan mutaxassis tomonidan 2025-yil asos solingan Musa Doors kompaniyasi O'zbekiston bozoriga o'zining premium, sifatli eshiklari bilan kirib keldi. Hozrgi kunda kompaniya Rossiya va Xitoy davlatlaridan ham yirik eshiklarni import qiluvchi yetakchi imperiyaga aylandi. Musa Doors sizga eng sifatli va hamyonbop eshiklarni taqdim etadi`,
       learnMore: 'Batafsil o\'qish',
     },
     contact: {
@@ -120,12 +120,12 @@ export const translations: Record<Language, Record<string, unknown>> = {
       relatedProducts: 'O\'xshash mahsulotlar',
     },
     aboutPage: {
-      heroTitle: 'Eshikdan ortidagi\nihonch',
+      heroTitle: 'Eshikdan ortidagi\nishonch',
       heroBadge: '2014-yildan buyon',
       heroSubtitle: 'Biz har bir oilaning uyini qurishga ishonch va go\'zallik qo\'shamiz. Har bir eshik — bizning sha\'nimiz.',
       storyTitle: 'Bizning tarix',
       storyP1: '2014-yilda Musa Do\'stmurodov oddiy usta sifatida bitta ustaxonada ish boshladi. U vaqtda maqsad bitta edi — odamlarga haqiqatan sifatli eshik taqdim etish.',
-      storyP2: 'Bugun Musa Doors — O\'zbekistoning 3 ta shahrida filiali, 200 dan ortiq model katalogi va 5000 dan ziyod xursand mijoz bilan Markaziy Osiyoning etakchi premium eshik brendidir.',
+      storyP2: 'Bugun Musa Doors — O\'zbekistoning 3 ta shahrida filiali, 200  dan ortiq model katalogi va 5000 dan ziyod xursand mijoz bilan Markaziy Osiyoning etakchi premium eshik brendidir.',
       storyP3: 'Har bir eshikni biz o\'zimiz uchun tanlagandek ishlab chiqamiz. Chunki siz bizning oilangiz uchun ham eng yaxshisini istaysiz.',
       valuesTitle: 'Bizning qadriyatlar',
       value1Title: 'Sifatdan murosasizlik',

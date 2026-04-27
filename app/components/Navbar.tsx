@@ -33,6 +33,16 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  // Mobile menu ochiq bo'lsa scroll blokla
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   const links = [
     { label: t('nav.home'), path: '/' },
     { label: t('nav.products'), path: '/products' },
@@ -62,7 +72,7 @@ const Navbar = () => {
     <>
       {/* Top Bar */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-[60] border-b transition-colors duration-300 ${
           isDark
             ? 'bg-slate-950 text-slate-100 border-slate-800'
             : 'bg-gray-900 text-white border-gray-800'
@@ -110,7 +120,7 @@ const Navbar = () => {
 
       {/* Main Navbar */}
       <nav
-        className={`fixed top-12 left-0 right-0 z-40 transition-all duration-300 border-b-2 ${
+        className={`fixed top-12 left-0 right-0 z-[55] transition-all duration-300 border-b-2 ${
           isDark
             ? 'bg-slate-950/95 border-slate-800 text-slate-100 backdrop-blur-xl'
             : 'bg-white border-gray-100 text-gray-900'
@@ -176,6 +186,7 @@ const Navbar = () => {
           <div className="lg:hidden flex items-center gap-2">
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Menu"
               className={`p-2 rounded-lg transition-colors ${
                 isDark ? 'hover:bg-slate-800' : 'hover:bg-gray-100'
               }`}
@@ -189,15 +200,20 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu — to'liq ekran overlay */}
         {mobileOpen && (
-          <div className={`lg:hidden border-t-2 px-4 py-4 space-y-1 shadow-lg ${isDark ? 'border-slate-800 bg-slate-950' : 'border-gray-200 bg-white'}`}>
+          <div
+            className={`lg:hidden fixed left-0 right-0 bottom-0 z-[54] overflow-y-auto px-4 py-6 space-y-1 shadow-2xl ${
+              isDark ? 'bg-slate-950' : 'bg-white'
+            }`}
+            style={{ top: '112px' }}
+          >
             {links.map((link) =>
               link.path.startsWith('/#') ? (
                 <button
                   key={link.path}
                   onClick={() => handleNav(link.path)}
-                  className={`block w-full text-left text-sm font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  className={`block w-full text-left text-base font-semibold py-4 px-4 rounded-xl transition-colors ${
                     isDark
                       ? 'text-slate-300 hover:text-white hover:bg-slate-800'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-amber-50'
@@ -210,7 +226,7 @@ const Navbar = () => {
                   key={link.path}
                   href={link.path}
                   onClick={() => setMobileOpen(false)}
-                  className={`block text-sm font-semibold py-3 px-4 rounded-lg transition-colors ${
+                  className={`block text-base font-semibold py-4 px-4 rounded-xl transition-colors ${
                     isActive(link.path)
                       ? 'text-amber-600 bg-amber-50'
                       : isDark
@@ -222,12 +238,15 @@ const Navbar = () => {
                 </Link>
               )
             )}
-            <Button
-              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 mt-4 border-0"
-              onClick={() => { setMobileOpen(false); setLeadOpen(true); }}
-            >
-              {lang === 'uz' ? 'Bepul konsultatsiya' : 'Бесплатная консультация'}
-            </Button>
+
+            <div className="pt-4 border-t border-gray-100">
+              <Button
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-4 h-14 text-base rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-200 border-0"
+                onClick={() => { setMobileOpen(false); setLeadOpen(true); }}
+              >
+                {lang === 'uz' ? 'Bepul konsultatsiya' : 'Бесплатная консультация'}
+              </Button>
+            </div>
           </div>
         )}
       </nav>
