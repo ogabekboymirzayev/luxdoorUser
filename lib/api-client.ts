@@ -12,11 +12,6 @@ const resolveApiBaseUrl = () => {
   if (envUrl) {
     return normalizeBaseUrl(envUrl);
   }
-
-  if (typeof window !== 'undefined') {
-    return `http://${window.location.hostname}:3001`;
-  }
-
   return 'http://localhost:3001';
 };
 

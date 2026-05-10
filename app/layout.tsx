@@ -5,12 +5,16 @@ import "./globals.css";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
+  verification: {
+    google: "ln-moYfyek346DIMWE32xHbgQLC7i-TTLadn2WR1DHM",
+  },
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Musa Doors | Premium Eshiklar",
+    default: "Musa Doors | Temir va MDF Eshiklar Toshkent",
     template: "%s | Musa Doors",
   },
-  description: "Musa Doors premium eshiklar katalogi: zamonaviy dizayn, sifatli material va tezkor xizmat.",
+  description: "Toshkentda eng sifatli temir va MDF eshiklar. Kirish eshiklari, xona eshiklari, panel eshiklar. Arzon narx, bepul o'rnatish.",
+  keywords: ["temir eshik", "MDF eshik", "eshik Toshkent", "kirish eshigi", "xona eshigi", "panel eshik", "eshik narxi", "eshik o'rnatish", "Musa Doors"],
   alternates: {
     canonical: "/",
   },
