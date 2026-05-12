@@ -208,10 +208,7 @@ const HeroSection = () => {
 
             <h1 className="font-bold leading-[1.1] tracking-tight mb-6 text-white">
               <span className="block text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
-                {lang === 'uz' ? 'Uyingiz —' : 'Ваш дом —'}
-              </span>
-              <span className="block text-5xl md:text-6xl lg:text-7xl xl:text-8xl bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent mt-1">
-                {lang === 'uz' ? 'sizning qasringiz' : 'ваша крепость'}
+                {lang === 'uz' ? 'Temir MDF eshiklar va elektron zamoklar.' : 'Металлические и МДФ двери с электронными замками.'}
               </span>
             </h1>
 

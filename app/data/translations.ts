@@ -10,7 +10,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
       leaveRequest: 'Bepul konsultatsiya',
     },
     hero: {
-      title: 'Uyingiz — sizning qasrиngiz',
+      title: `Temir MDF eshiklar va elektron zamoklar.`,
       titleAccent: 'Premium eshiklar bilan',
       subtitle: '10 yildan ortiq biz Markaziy Osiyoning 3 ta shahridagi mijozlarimizga ishonch, sifat va go\'zallikni uylariga olib kiramiz. Bitta eshik — butun atmosfera.',
       viewCatalog: 'Katalogni ko\'rish',
@@ -173,7 +173,7 @@ export const translations: Record<Language, Record<string, unknown>> = {
       leaveRequest: 'Бесплатная консультация',
     },
     hero: {
-      title: 'Ваш дом — ваша\nкрепость',
+      title: `Металлические и МДФ двери с электронными замками.`,
       titleAccent: 'Двери премиум-класса',
       subtitle: 'Уже более 10 лет мы привносим уверенность, качество и красоту в дома клиентов по всей Центральной Азии. Одна дверь — целая атмосфера.',
       viewCatalog: 'Смотреть каталог',
